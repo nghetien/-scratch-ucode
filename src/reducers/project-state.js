@@ -30,6 +30,7 @@ const START_UPDATING_BEFORE_CREATING_COPY =
     'scratch-gui/project-state/START_UPDATING_BEFORE_CREATING_COPY';
 const START_UPDATING_BEFORE_CREATING_NEW =
     'scratch-gui/project-state/START_UPDATING_BEFORE_CREATING_NEW';
+const UPDATE_PROJECT_DATA = 'scratch-gui/project-state/UPDATE_PROJECT_DATA';
 
 const defaultProjectId = '0'; // hardcoded id of default project
 
@@ -104,7 +105,6 @@ const initialState = {
 
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
-
     switch (action.type) {
         case DONE_CREATING_NEW:
             // We need to set project id since we just created new project on the server.
@@ -383,6 +383,10 @@ const reducer = function (state, action) {
                 });
             }
             return state;
+        case UPDATE_PROJECT_DATA:
+            return Object.assign({}, state, {
+                projectData: action.projectData,
+            });
         default:
             return state;
     }
@@ -458,6 +462,11 @@ const onLoadedProject = (loadingState, canSave, success) => {
             return;
     }
 };
+
+const onLoadFromDraft = projectData => ({
+    type: UPDATE_PROJECT_DATA,
+    projectData,
+});
 
 const doneUpdatingProject = loadingState => {
     switch (loadingState) {
@@ -557,4 +566,5 @@ export {
     requestProjectUpload,
     saveProjectAsCopy,
     setProjectId,
+    onLoadFromDraft,
 };

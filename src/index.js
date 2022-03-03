@@ -12,6 +12,9 @@ import LocalesReducer, {
     initLocale,
 } from './reducers/locales';
 import AuthReducer, { authInitialState } from './reducers/auth';
+import CurrentQuestionReducer, {
+    currentQuestionInitialState,
+} from './reducers/current-question';
 import { ScratchPaintReducer } from 'scratch-paint';
 import { setFullScreen, setPlayer } from './reducers/mode';
 import { remixProject } from './reducers/project-state';
@@ -19,6 +22,7 @@ import { setAppElement } from 'react-modal';
 
 const guiReducers = {
     auth: AuthReducer,
+    currentQuestion: CurrentQuestionReducer,
     locales: LocalesReducer,
     scratchGui: GuiReducer,
     scratchPaint: ScratchPaintReducer,
@@ -36,6 +40,7 @@ export {
     initFullScreen,
     initLocale,
     authInitialState,
+    currentQuestionInitialState,
     localesInitialState,
     remixProject,
     setFullScreen,

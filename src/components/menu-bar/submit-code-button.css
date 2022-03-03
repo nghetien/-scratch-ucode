@@ -1,0 +1,9 @@
+@import "../../css/colors.css";
+
+.submit-code-button {
+    background: $data-primary;
+    margin: 0 0.5rem;
+}
+.icon-submit {
+    margin-right: 0.5rem;
+}

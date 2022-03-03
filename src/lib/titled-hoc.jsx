@@ -55,7 +55,7 @@ const TitledHOC = function (WrappedComponent) {
                     messages.defaultProjectTitle,
                 );
             }
-            this.props.onChangedProjectTitle(newTitle);
+            // this.props.onChangedProjectTitle(newTitle);
             return newTitle;
         }
         render() {

@@ -1,9 +1,9 @@
-import { GET_USER_INFO } from '../api-url';
-import { uCodeService } from '../config';
+import {USER_INFO_URL} from '../api-url';
+import {uCodeService} from '../config';
 
 export const userService = {
     getUserInfo: () => {
-        return uCodeService.get(GET_USER_INFO);
+        return uCodeService.get(USER_INFO_URL);
     },
 };
 

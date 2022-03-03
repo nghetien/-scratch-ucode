@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { mainStore } from '../lib/app-state-hoc.jsx';
+import {mainStore} from '../lib/app-state-hoc.jsx';
 
 const CONFIG_DATA_RESPONSE = res => ({
-    code: res && res.status,
-    status: res && res.data && res.data.status ? res.data.status : false,
+    code: res && res.data.error_code === 0 ? 200 : res.data.error_code,
+    success: res && res.data && res.data.success ? res.data.success : false,
     message: res && res.data && res.data.message ? res.data.message : '',
     data: res && res.data && res.data.data ? res.data.data : {},
 });

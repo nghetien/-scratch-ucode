@@ -1,2 +1,3 @@
-export const GET_TENANT_INFO = '/tenant';
-export const GET_USER_INFO = '/users/info';
+export const USER_INFO_URL = '/users/info';
+export const DRAFT_URL = '/user-data/draft';
+export const QUESTION_URL = '/question/';
