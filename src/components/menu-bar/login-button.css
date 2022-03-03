@@ -1,0 +1,6 @@
+@import "../../css/colors.css";
+
+.login-button {
+    background: $data-primary;
+    margin: 0 0.75rem;
+}

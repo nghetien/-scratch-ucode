@@ -1,0 +1,21 @@
+module.exports = {
+    extends: ['scratch', 'scratch/node'],
+    rules: {
+        'no-undefined': 'off',
+        'object-curly-spacing': [2, 'always'],
+        'comma-dangle': ['error', 'only-multiline'],
+        'space-before-function-paren': 'off',
+        'react/jsx-no-bind': 'off',
+        'no-confusing-arrow': 'off',
+        'react/jsx-max-props-per-line': 'off',
+        'operator-linebreak': 'off',
+        indent: 'off',
+        'require-jsdoc': 'off',
+        'react/jsx-no-literals': 'off',
+        'func-style': 'off',
+        'react/prop-types': 'off',
+        'import/named': 'off',
+        'arrow-body-style': 'off',
+        'quote-props': 'off',
+    },
+};

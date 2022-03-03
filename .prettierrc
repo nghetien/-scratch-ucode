@@ -1,0 +1,9 @@
+{
+    "endOfLine": "auto",
+    "semi": true,
+    "tabWidth": 4,
+    "trailingComma": "all",
+    "arrowParens": "avoid",
+    "singleQuote": true,
+    "vueIndentScriptAndStyle": true
+}
