@@ -1,5 +1,5 @@
-import {QUESTION_URL} from '../api-url';
-import {uCodeService} from '../config';
+import { QUESTION_URL } from '../api-url';
+import { uCodeService } from '../config';
 
 export const questionService = {
     getQuestionInfo: questionId => {

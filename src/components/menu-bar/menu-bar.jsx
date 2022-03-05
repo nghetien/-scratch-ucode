@@ -68,8 +68,10 @@ import scratchLogo from './scratch-logo.svg';
 import sharedMessages from '../../lib/shared-messages';
 import SECRET_KEY from '../../../static/secretKey';
 import { updateAccessToken, updateInfoUser } from '../../reducers/auth';
-import { ACCESS_TOKEN } from '../../constants';
+import { ACCESS_TOKEN, LANGUAGE_CODE } from '../../constants';
 import draftService from '../../services/api/draft';
+import StatusSaving from '../../constants/status-save';
+import submitCodeService from '../../services/api/submit-coding';
 
 const ariaMessages = defineMessages({
     language: {
@@ -149,6 +151,9 @@ AboutButton.propTypes = {
 class MenuBar extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            isSaving: StatusSaving.NORMAL,
+        };
         bindAll(this, [
             'handleClickNew',
             'handleClickSave',
@@ -186,18 +191,42 @@ class MenuBar extends React.Component {
         this.props.onRequestCloseFile();
     }
     async handleClickSave() {
+        this.setState({
+            isSaving: StatusSaving.IS_LOADING,
+        });
         await this.saveDraft();
         this.props.onClickSave();
         this.props.onRequestCloseFile();
+        setTimeout(() => {
+            this.setState({
+                isSaving: StatusSaving.NORMAL,
+            });
+        }, 1000);
     }
-    async saveDraft() {
-        const res = await draftService.saveDraft({
-            key: this.props.keyDraft,
-            value: JSON.stringify(this.props.projectData),
+    saveDraft() {
+        this.props.vm.saveProjectSb3().then(content => {
+            const reader = new FileReader();
+            reader.readAsDataURL(content);
+            const _this = this;
+            reader.onload = function () {
+                draftService
+                    .saveDraft({
+                        key: _this.props.keyDraft,
+                        value: reader.result,
+                    })
+                    .then(res => {
+                        if (res.success) {
+                            _this.setState({
+                                isSaving: StatusSaving.LOADED,
+                            });
+                        }
+                    });
+            };
+            reader.onerror = function (error) {
+                // eslint-disable-next-line no-console
+                console.log('Error: ', error);
+            };
         });
-        if (res.success) {
-            console.log(res.data);
-        }
     }
     handleClickSaveAsCopy() {
         this.props.onClickSaveAsCopy();
@@ -207,18 +236,15 @@ class MenuBar extends React.Component {
         console.log(waitForUpdate);
         // TODO
         // if (!this.props.isShared) {
-        //     console.log(waitForUpdate);
         //     if (this.props.canShare) {
         //         // save before transitioning to project page
         //         this.props.onShare();
         //     }
         //     if (this.props.canSave) {
-        //         console.log(3);
         //         // save before transitioning to project page
         //         this.props.autoUpdateProject();
         //         waitForUpdate(true); // queue the transition to project page
         //     } else {
-        //         console.log(4);
         //         waitForUpdate(false); // immediately transition to project page
         //     }
         // }
@@ -234,8 +260,38 @@ class MenuBar extends React.Component {
         const token = jwt.sign(dataHash, SECRET_KEY);
         window.location = `${process.env.ID_UCODE}/?state=${token}`;
     }
-    handleClickRunTest() {}
-    handleClickSubmitCode() {}
+    handleDataSubmitCode(isRunSampleTest) {
+        const dataSubmit = {
+            language_id: LANGUAGE_CODE,
+            is_run_sample_test: isRunSampleTest,
+            scratch3_url: window.location.href,
+        };
+        if (this.props.lessonId) {
+            dataSubmit.quiz_id = this.props.lessonId;
+        }
+        if (this.props.courseId) {
+            dataSubmit.course_id = this.props.courseId;
+        }
+        return dataSubmit;
+    }
+    async handleClickRunTest() {
+        const res = await submitCodeService.submitCodeQuestion(
+            this.props.questionId,
+            this.handleDataSubmitCode(true),
+        );
+        if (res.success) {
+            console.log(res);
+        }
+    }
+    async handleClickSubmitCode() {
+        const res = await submitCodeService.submitCodeQuestion(
+            this.props.questionId,
+            this.handleDataSubmitCode(false),
+        );
+        if (res.success) {
+            console.log(res);
+        }
+    }
     handleClickLogout() {
         localStorage.setItem(ACCESS_TOKEN, '');
         this.props.updateAccessToken('');
@@ -591,25 +647,31 @@ class MenuBar extends React.Component {
                     {this.props.accessTokenExists && this.props.emailUser ? (
                         <React.Fragment>
                             <React.Fragment>
-                                <SaveCodeButton
-                                    onClick={() => {
-                                        this.handleClickSave();
-                                    }}
-                                />
-                                <SubmitCodeButton
-                                    className={styles.menuBarButton}
-                                    /* eslint-disable react/jsx-no-bind */
-                                    onClick={() => {
-                                        this.handleClickSubmitCode();
-                                    }}
-                                />
-                                <RunTestButton
-                                    className={styles.menuBarButton}
-                                    /* eslint-disable react/jsx-no-bind */
-                                    onClick={() => {
-                                        this.handleClickRunTest();
-                                    }}
-                                />
+                                {this.props.keyDraft ? (
+                                    <React.Fragment>
+                                        <SaveCodeButton
+                                            onClick={() => {
+                                                this.handleClickSave();
+                                            }}
+                                            isSaving={this.state.isSaving}
+                                        />
+                                        <SubmitCodeButton
+                                            className={styles.menuBarButton}
+                                            /* eslint-disable react/jsx-no-bind */
+                                            onClick={() => {
+                                                this.handleClickSubmitCode();
+                                            }}
+                                        />
+                                        <RunTestButton
+                                            className={styles.menuBarButton}
+                                            /* eslint-disable react/jsx-no-bind */
+                                            onClick={() => {
+                                                this.handleClickRunTest();
+                                            }}
+                                        />
+                                    </React.Fragment>
+                                ) : null}
+
                                 <AccountNav
                                     className={classNames(
                                         styles.menuBarItem,
@@ -723,8 +785,10 @@ const mapStateToProps = state => {
         accessTokenExists: accessToken ? accessToken.length !== 0 : false,
         emailUser: email ? email : null,
         vm: state.scratchGui.vm,
-        projectData: state.scratchGui.projectState.projectData,
         keyDraft: state.currentQuestion.key,
+        courseId: state.currentQuestion.courseId,
+        lessonId: state.currentQuestion.lessonId,
+        questionId: state.currentQuestion.questionId,
     };
 };
 

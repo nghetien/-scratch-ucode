@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {mainStore} from '../lib/app-state-hoc.jsx';
+import { mainStore } from '../lib/app-state-hoc.jsx';
 
 const CONFIG_DATA_RESPONSE = res => ({
     code: res && res.data.error_code === 0 ? 200 : res.data.error_code,

@@ -3,3 +3,10 @@
     cursor: pointer;
     margin-right: 0.5rem;
 }
+
+.saved {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    opacity: 0.8;
+}

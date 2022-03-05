@@ -27,7 +27,6 @@ import { detectLocale } from './detect-locale';
 import RedirectUriAuth from '../pages/redirect-uri-auth.jsx';
 import { ACCESS_TOKEN } from '../constants';
 import { userService, questionService, draftService } from '../services';
-import { onLoadFromDraft } from '../reducers/project-state';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -137,7 +136,6 @@ const AppStateHOC = function (WrappedComponent, localesOnly) {
                     getParams.q,
                 );
             }
-            console.log('app-state-hoc', this.store.getState());
         }
         componentDidUpdate(prevProps) {
             if (localesOnly) return;
@@ -190,7 +188,22 @@ const AppStateHOC = function (WrappedComponent, localesOnly) {
                     key,
                 });
                 if (res.success) {
-                    this.store.dispatch(onLoadFromDraft(JSON.parse(res.data.value)));
+                    const url = res.data.value;
+                    const _this = this;
+                    fetch(url)
+                        .then(resB64 => resB64.blob())
+                        .then(blob => {
+                            const file = new File([blob], 'File name', {
+                                type: 'application/x.scratch.sb3',
+                            });
+                            const fileReader = new FileReader();
+                            fileReader.onload = function () {
+                                _this.store
+                                    .getState()
+                                    .scratchGui.vm.loadProject(this.result);
+                            };
+                            fileReader.readAsArrayBuffer(file);
+                        });
                 }
             }
         }
